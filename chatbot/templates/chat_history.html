@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight-steel">
+<head>
+  <meta charset="UTF-8">
+  <title>NeuroScan AI · Chat History</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+
+    /* ================================================
+       THEME SYSTEM — 5 THEMES (synced across all pages)
+    ================================================ */
+    [data-theme="midnight-steel"] {
+      --bg:#0e0e12; --surface:#16161d; --surface2:#1c1c26; --border:#2a2a3d;
+      --accent:#7c6ff7; --accent2:#a89eff; --accent-glow:rgba(124,111,247,0.14);
+      --text:#eeeef5; --muted:#6b6b8a; --success:#3dd68c; --warning:#ffb444; --danger:#ff5c72;
+      --mild:#ffb444; --moderate:#ff5c72;
+    }
+    [data-theme="ivory-studio"] {
+      --bg:#f5f2ed; --surface:#faf8f4; --surface2:#eeebe4; --border:#ddd8cf;
+      --accent:#0d7377; --accent2:#14a8ad; --accent-glow:rgba(13,115,119,0.08);
+      --text:#1a1714; --muted:#7a7163; --success:#2d8a5e; --warning:#b06800; --danger:#c0392b;
+      --mild:#b06800; --moderate:#c0392b;
+    }
+    [data-theme="obsidian-rose"] {
+      --bg:#0c0809; --surface:#130d0f; --surface2:#1a1012; --border:#2e1c20;
+      --accent:#e8956d; --accent2:#f2b48e; --accent-glow:rgba(232,149,109,0.12);
+      --text:#f5ede8; --muted:#7a5c5c; --success:#6fcf97; --warning:#f2c94c; --danger:#eb5757;
+      --mild:#f2c94c; --moderate:#eb5757;
+    }
+    [data-theme="nordic-slate"] {
+      --bg:#f2f4f8; --surface:#ffffff; --surface2:#edf0f5; --border:#d4d9e6;
+      --accent:#3b5bdb; --accent2:#748ffc; --accent-glow:rgba(59,91,219,0.08);
+      --text:#1a1f36; --muted:#8792a8; --success:#0ca678; --warning:#f08c00; --danger:#e03131;
+      --mild:#f08c00; --moderate:#e03131;
+    }
+    [data-theme="deep-ocean"] {
+      --bg:#040f14; --surface:#071820; --surface2:#0b2030; --border:#0f3248;
+      --accent:#00d4aa; --accent2:#4dffd6; --accent-glow:rgba(0,212,170,0.12);
+      --text:#e0f7f4; --muted:#3d7a72; --success:#00d4aa; --warning:#ffd166; --danger:#ff6b6b;
+      --mild:#ffd166; --moderate:#ff6b6b;
+    }
+    /* Light theme card polish */
+    [data-theme="ivory-studio"] .stat-card,
+    [data-theme="ivory-studio"] .section-card,
+    [data-theme="ivory-studio"] .chat-card,
+    [data-theme="ivory-studio"] .report-card,
+    [data-theme="ivory-studio"] .sidebar,
+    [data-theme="nordic-slate"]  .stat-card,
+    [data-theme="nordic-slate"]  .section-card,
+    [data-theme="nordic-slate"]  .chat-card,
+    [data-theme="nordic-slate"]  .report-card,
+    [data-theme="nordic-slate"]  .sidebar { box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    body { transition: background 0.3s, color 0.3s; }
+
+    [data-theme="midnight-steel"] {
+      --bg:#080c14; --surface:#0d1421; --surface2:#111827;
+      --border:#1e2d45; --accent:#0ea5e9; --accent2:#38bdf8;
+      --accent-glow:rgba(14,165,233,0.15); --text:#f0f6ff; --muted:#64748b;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      position:fixed; left:0; top:0; bottom:0; width:240px;
+      background:var(--surface); border-right:1px solid var(--border);
+      display:flex; flex-direction:column; padding:1.5rem 0; z-index:100;
+    }
+    .logo { display:flex; align-items:center; gap:.75rem; padding:0 1.5rem; margin-bottom:2rem; }
+    .logo-icon { width:38px; height:38px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1rem; color:white; box-shadow:0 0 15px var(--accent-glow); }
+    .logo-text { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; }
+    .logo-text span { color:var(--accent); }
+    .nav-section { padding:0 .75rem; margin-bottom:.5rem; }
+    .nav-label { font-size:.65rem; font-weight:600; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; padding:0 .75rem; margin-bottom:.4rem; }
+    .nav-item { display:flex; align-items:center; gap:.75rem; padding:.65rem .75rem; border-radius:8px; color:var(--muted); text-decoration:none; font-size:.88rem; font-weight:500; transition:all .15s; }
+    .nav-item:hover { background:var(--surface2); color:var(--text); }
+    .nav-item.active { background:var(--accent-glow); color:var(--accent); border:1px solid rgba(14,165,233,.2); }
+    .nav-item i { width:16px; text-align:center; font-size:.85rem; }
+    .sidebar-footer { margin-top:auto; padding:1rem 1.5rem; border-top:1px solid var(--border); }
+    .user-info { display:flex; align-items:center; gap:.75rem; }
+    .user-avatar { width:34px; height:34px; background:linear-gradient(135deg,#1e3a5f,#0ea5e9); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:600; color:white; flex-shrink:0; }
+    .user-name { font-size:.82rem; font-weight:500; }
+    .user-role { font-size:.7rem; color:var(--muted); }
+    .logout-btn { margin-left:auto; color:var(--muted); font-size:.85rem; cursor:pointer; text-decoration:none; transition:color .2s; }
+    .logout-btn:hover { color:#ef4444; }
+
+    /* Main */
+    .main { margin-left:240px; padding:2rem; min-height:100vh; max-width:860px; }
+    .page-header { display:flex; align-items:center; gap:1rem; margin-bottom:2rem; }
+    .back-btn { background:transparent; border:1px solid var(--border); color:var(--muted); padding:.5rem 1rem; border-radius:8px; font-size:.82rem; cursor:pointer; text-decoration:none; display:flex; align-items:center; gap:.4rem; transition:all .2s; }
+    .back-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .page-title { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; }
+    .page-sub { color:var(--muted); font-size:.82rem; margin-top:.2rem; }
+
+    /* Scan context */
+    .scan-badge { display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .9rem; border-radius:20px; font-size:.78rem; font-weight:600; margin-bottom:1.5rem; }
+    .badge-none { background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.25); color:#34d399; }
+    .badge-very-mild { background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.25); color:#fbbf24; }
+    .badge-mild { background:rgba(249,115,22,.1); border:1px solid rgba(249,115,22,.25); color:#fb923c; }
+    .badge-moderate { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.25); color:#f87171; }
+
+    /* Messages */
+    .messages { display:flex; flex-direction:column; gap:1.2rem; }
+    .msg { display:flex; gap:.75rem; max-width:85%; }
+    .msg.user { align-self:flex-end; flex-direction:row-reverse; }
+    .msg-avatar { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; flex-shrink:0; }
+    .bot-avatar { background:linear-gradient(135deg,#1e3a5f,var(--accent)); color:white; }
+    .user-avatar-m { background:var(--surface2); border:1px solid var(--border); color:var(--muted); }
+    .msg-content { flex:1; }
+    .msg-bubble { padding:.85rem 1rem; border-radius:12px; font-size:.88rem; line-height:1.7; }
+    .bot-bubble { background:var(--surface2); border:1px solid var(--border); border-top-left-radius:4px; }
+    .user-bubble { background:linear-gradient(135deg,rgba(14,165,233,.2),rgba(56,189,248,.15)); border:1px solid rgba(14,165,233,.25); border-top-right-radius:4px; }
+    .msg-time { font-size:.68rem; color:var(--muted); margin-top:.3rem; font-family:'DM Mono',monospace; }
+    .msg.user .msg-time { text-align:right; }
+
+    /* Markdown */
+    .msg-bubble h2 { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; color:var(--accent2); margin:.75rem 0 .4rem; padding-bottom:.2rem; border-bottom:1px solid var(--border); }
+    .msg-bubble h3 { font-size:.82rem; font-weight:600; color:var(--text); margin:.5rem 0 .3rem; }
+    .msg-bubble p { margin-bottom:.5rem; }
+    .msg-bubble p:last-child { margin-bottom:0; }
+    .msg-bubble ul, .msg-bubble ol { padding-left:1.2rem; margin-bottom:.5rem; }
+    .msg-bubble li { margin-bottom:.25rem; }
+    .msg-bubble strong { color:var(--text); font-weight:600; }
+    .msg-bubble em { color:var(--muted); font-style:italic; }
+
+    /* ---- Sidebar Theme Switcher ---- */
+    .theme-switcher-sidebar { position: relative; }
+    .theme-toggle-sidebar {
+      width:100%; display:flex; align-items:center; gap:.6rem;
+      padding:.55rem .75rem; border-radius:8px; cursor:pointer;
+      border:1px solid var(--border); background:var(--surface2); color:var(--text);
+      font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:500;
+      transition:all .2s;
+    }
+    .theme-toggle-sidebar:hover { border-color:var(--accent); color:var(--accent); }
+    .t-dot-s {
+      width:9px; height:9px; border-radius:50%; flex-shrink:0;
+      background:var(--accent); box-shadow:0 0 6px var(--accent);
+      transition:background .3s, box-shadow .3s;
+    }
+    .theme-dd-sidebar {
+      position:absolute; bottom:calc(100% + 6px); left:0; right:0;
+      background:var(--surface); border:1px solid var(--border); border-radius:10px;
+      padding:.4rem; z-index:999; display:none; flex-direction:column; gap:.15rem;
+      box-shadow:0 -16px 40px rgba(0,0,0,.35);
+      animation:ddUp .15s cubic-bezier(.34,1.4,.64,1);
+    }
+    .theme-dd-sidebar.open { display:flex; }
+    @keyframes ddUp { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+    .topt {
+      display:flex; align-items:center; gap:.55rem;
+      padding:.4rem .55rem; border-radius:7px; cursor:pointer;
+      border:none; background:transparent; width:100%; text-align:left;
+      font-family:'DM Sans',sans-serif; font-size:.78rem; color:var(--text);
+      transition:background .12s;
+    }
+    .topt:hover { background:var(--surface2); }
+    .topt.active { background:var(--accent-glow); color:var(--accent); }
+    .topt small { display:block; font-size:.65rem; color:var(--muted); margin-top:.02rem; }
+    .topt.active small { color:var(--accent2); }
+    .tck { margin-left:auto; font-size:.65rem; opacity:0; }
+    .topt.active .tck { opacity:1; }
+    .tsw {
+      width:24px; height:24px; border-radius:6px; flex-shrink:0;
+      border:1.5px solid rgba(255,255,255,.08);
+    }
+    .sw1{background:linear-gradient(135deg,#0e0e12 50%,#7c6ff7);}
+    .sw2{background:linear-gradient(135deg,#f5f2ed 50%,#0d7377);}
+    .sw3{background:linear-gradient(135deg,#0c0809 50%,#e8956d);}
+    .sw4{background:linear-gradient(135deg,#f2f4f8 50%,#3b5bdb);}
+    .sw5{background:linear-gradient(135deg,#040f14 50%,#00d4aa);}
+    [data-theme="ivory-studio"] .tsw,
+    [data-theme="nordic-slate"]  .tsw { border-color:rgba(0,0,0,.12); }
+
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon"><i class="fas fa-brain"></i></div>
+      <div class="logo-text">Neuro<span>Scan</span> AI</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a href="/dashboard" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="/" class="nav-item"><i class="fas fa-upload"></i> New Scan</a>
+      <a href="/history" class="nav-item"><i class="fas fa-history"></i> Scan History</a>
+    </div>
+    <div class="nav-section" style="margin-top:1rem">
+      <div class="nav-label">Reports</div>
+      <a href="/chat_history" class="nav-item active"><i class="fas fa-comments"></i> Chat History</a>
+    </div>
+
+    <!-- Theme Switcher in sidebar -->
+    <div style="padding:0 0.75rem;margin-bottom:0.5rem;">
+      <div style="font-size:.65rem;font-weight:600;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;padding:0 .75rem;margin-bottom:.4rem;">Appearance</div>
+      <div class="theme-switcher-sidebar">
+        <button class="theme-toggle-sidebar" onclick="toggleThemeDD()" id="themeSideBtn">
+          <span class="t-dot-s" id="tDotS"></span>
+          <span id="themeLabelS">Theme</span>
+          <i class="fas fa-chevron-down" style="font-size:.6rem;margin-left:auto;"></i>
+        </button>
+        <div class="theme-dd-sidebar" id="themeDD">
+          <button class="topt" data-k="midnight-steel" onclick="setTheme('midnight-steel',this)">
+            <span class="tsw sw1"></span><span>Midnight Steel<small>Charcoal · Violet</small></span><i class="fas fa-check tck"></i>
+          </button>
+          <button class="topt" data-k="ivory-studio" onclick="setTheme('ivory-studio',this)">
+            <span class="tsw sw2"></span><span>Ivory Studio<small>Warm White · Teal</small></span><i class="fas fa-check tck"></i>
+          </button>
+          <button class="topt" data-k="obsidian-rose" onclick="setTheme('obsidian-rose',this)">
+            <span class="tsw sw3"></span><span>Obsidian Rose<small>Near-Black · Amber</small></span><i class="fas fa-check tck"></i>
+          </button>
+          <button class="topt" data-k="nordic-slate" onclick="setTheme('nordic-slate',this)">
+            <span class="tsw sw4"></span><span>Nordic Slate<small>Cool White · Indigo</small></span><i class="fas fa-check tck"></i>
+          </button>
+          <button class="topt" data-k="deep-ocean" onclick="setTheme('deep-ocean',this)">
+            <span class="tsw sw5"></span><span>Deep Ocean<small>Dark Teal · Aqua</small></span><i class="fas fa-check tck"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ current_user.name[0]|upper }}</div>
+        <div>
+          <div class="user-name">{{ current_user.name }}</div>
+          <div class="user-role">Medical Professional</div>
+        </div>
+        <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i></a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <a href="/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+      <div>
+        <div class="page-title">Chat Session</div>
+        <div class="page-sub">{{ chat_session.created_at.strftime('%d %B %Y, %I:%M %p') }} · {{ messages|length }} messages</div>
+      </div>
+    </div>
+
+    {% if chat_session.scan_stage %}
+      {% if chat_session.scan_stage == 'NonDemented' %}
+        <span class="scan-badge badge-none">🟢 Scan Context: Non Demented</span>
+      {% elif chat_session.scan_stage == 'VeryMildDemented' %}
+        <span class="scan-badge badge-very-mild">🟡 Scan Context: Very Mild</span>
+      {% elif chat_session.scan_stage == 'MildDemented' %}
+        <span class="scan-badge badge-mild">🟠 Scan Context: Mild</span>
+      {% elif chat_session.scan_stage == 'ModerateDemented' %}
+        <span class="scan-badge badge-moderate">🔴 Scan Context: Moderate</span>
+      {% endif %}
+    {% endif %}
+
+    <div class="messages">
+      {% for msg in messages %}
+      <div class="msg {{ 'user' if msg.role == 'user' else '' }}">
+        <div class="msg-avatar {{ 'user-avatar-m' if msg.role == 'user' else 'bot-avatar' }}">
+          <i class="fas fa-{{ 'user' if msg.role == 'user' else 'robot' }}"></i>
+        </div>
+        <div class="msg-content">
+          <div class="msg-bubble {{ 'user-bubble' if msg.role == 'user' else 'bot-bubble' }}" data-content="{{ msg.content|e }}" data-role="{{ msg.role }}">
+          </div>
+          <div class="msg-time">{{ msg.created_at.strftime('%I:%M %p') }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+
+  <script>
+    // Render markdown for bot messages
+    document.querySelectorAll('.msg-bubble').forEach(bubble => {
+      const content = bubble.getAttribute('data-content');
+      const role    = bubble.getAttribute('data-role');
+      if (role === 'assistant') {
+        bubble.innerHTML = marked.parse(content);
+      } else {
+        bubble.textContent = content;
+      }
+    });
+  </script>
+
+  <script>
+    const NS_THEME_COLORS = {
+      'midnight-steel':'#7c6ff7','ivory-studio':'#0d7377',
+      'obsidian-rose':'#e8956d','nordic-slate':'#3b5bdb','deep-ocean':'#00d4aa'
+    };
+    const NS_THEME_NAMES = {
+      'midnight-steel':'Midnight Steel','ivory-studio':'Ivory Studio',
+      'obsidian-rose':'Obsidian Rose','nordic-slate':'Nordic Slate','deep-ocean':'Deep Ocean'
+    };
+    function setTheme(k, btn) {
+      document.documentElement.setAttribute('data-theme', k);
+      const dot = document.getElementById('tDotS');
+      if(dot){ dot.style.background=NS_THEME_COLORS[k]; dot.style.boxShadow='0 0 7px '+NS_THEME_COLORS[k]; }
+      const lbl = document.getElementById('themeLabelS');
+      if(lbl) lbl.textContent = NS_THEME_NAMES[k];
+      document.querySelectorAll('.topt').forEach(o=>o.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      localStorage.setItem('ns-theme', k);
+      closeThemeDD();
+    }
+    function toggleThemeDD(){ document.getElementById('themeDD').classList.toggle('open'); }
+    function closeThemeDD(){ const d=document.getElementById('themeDD'); if(d) d.classList.remove('open'); }
+    document.addEventListener('click', function(e){
+      const sw = document.querySelector('.theme-switcher-sidebar');
+      if(sw && !sw.contains(e.target)) closeThemeDD();
+    });
+    (function(){
+      const saved = localStorage.getItem('ns-theme') || 'midnight-steel';
+      const btn = document.querySelector('.topt[data-k="'+saved+'"]');
+      setTheme(saved, btn);
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight-steel">
+<head>
+  <meta charset="UTF-8">
+  <title>NeuroScan AI · Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+
+    /* ================================================
+       THEME SYSTEM — 5 THEMES (synced across all pages)
+    ================================================ */
+    [data-theme="midnight-steel"] {
+      --bg:#0e0e12; --surface:#16161d; --surface2:#1c1c26; --border:#2a2a3d;
+      --accent:#7c6ff7; --accent2:#a89eff; --accent-glow:rgba(124,111,247,0.14);
+      --text:#eeeef5; --muted:#6b6b8a; --success:#3dd68c; --warning:#ffb444; --danger:#ff5c72;
+      --mild:#ffb444; --moderate:#ff5c72;
+    }
+    [data-theme="ivory-studio"] {
+      --bg:#f5f2ed; --surface:#faf8f4; --surface2:#eeebe4; --border:#ddd8cf;
+      --accent:#0d7377; --accent2:#14a8ad; --accent-glow:rgba(13,115,119,0.08);
+      --text:#1a1714; --muted:#7a7163; --success:#2d8a5e; --warning:#b06800; --danger:#c0392b;
+      --mild:#b06800; --moderate:#c0392b;
+    }
+    [data-theme="obsidian-rose"] {
+      --bg:#0c0809; --surface:#130d0f; --surface2:#1a1012; --border:#2e1c20;
+      --accent:#e8956d; --accent2:#f2b48e; --accent-glow:rgba(232,149,109,0.12);
+      --text:#f5ede8; --muted:#7a5c5c; --success:#6fcf97; --warning:#f2c94c; --danger:#eb5757;
+      --mild:#f2c94c; --moderate:#eb5757;
+    }
+    [data-theme="nordic-slate"] {
+      --bg:#f2f4f8; --surface:#ffffff; --surface2:#edf0f5; --border:#d4d9e6;
+      --accent:#3b5bdb; --accent2:#748ffc; --accent-glow:rgba(59,91,219,0.08);
+      --text:#1a1f36; --muted:#8792a8; --success:#0ca678; --warning:#f08c00; --danger:#e03131;
+      --mild:#f08c00; --moderate:#e03131;
+    }
+    [data-theme="deep-ocean"] {
+      --bg:#040f14; --surface:#071820; --surface2:#0b2030; --border:#0f3248;
+      --accent:#00d4aa; --accent2:#4dffd6; --accent-glow:rgba(0,212,170,0.12);
+      --text:#e0f7f4; --muted:#3d7a72; --success:#00d4aa; --warning:#ffd166; --danger:#ff6b6b;
+      --mild:#ffd166; --moderate:#ff6b6b;
+    }
+    /* Light theme card polish */
+    [data-theme="ivory-studio"] .stat-card,
+    [data-theme="ivory-studio"] .section-card,
+    [data-theme="ivory-studio"] .chat-card,
+    [data-theme="ivory-studio"] .report-card,
+    [data-theme="ivory-studio"] .sidebar,
+    [data-theme="nordic-slate"]  .stat-card,
+    [data-theme="nordic-slate"]  .section-card,
+    [data-theme="nordic-slate"]  .chat-card,
+    [data-theme="nordic-slate"]  .report-card,
+    [data-theme="nordic-slate"]  .sidebar { box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    body { transition: background 0.3s, color 0.3s; }
+
+    [data-theme="midnight-steel"] {
+      --bg: #080c14;
+      --surface: #0d1421;
+      --surface2: #111827;
+      --border: #1e2d45;
+      --accent: #0ea5e9;
+      --accent2: #38bdf8;
+      --accent-glow: rgba(14,165,233,0.15);
+      --text: #f0f6ff;
+      --muted: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --mild: #f59e0b;
+      --moderate: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: 240px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 0;
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: white;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .logo-text span { color: var(--accent); }
+
+    .nav-section {
+      padding: 0 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .nav-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0 0.75rem;
+      margin-bottom: 0.4rem;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(14,165,233,0.2); }
+    .nav-item i { width: 16px; text-align: center; font-size: 0.85rem; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .user-avatar {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #1e3a5f, #0ea5e9);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+    .user-name { font-size: 0.82rem; font-weight: 500; }
+    .user-role { font-size: 0.7rem; color: var(--muted); }
+    .logout-btn {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .logout-btn:hover { color: var(--danger); }
+
+    /* Main content */
+    .main { margin-left: 240px; padding: 2rem; min-height: 100vh; }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .page-subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 0.2rem; }
+
+    .btn-new {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .btn-new:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(14,165,233,0.3); }
+
+    /* Stats cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: rgba(14,165,233,0.3); }
+    .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    .stat-value { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 700; }
+    .stat-icon { float: right; margin-top: -2.2rem; font-size: 1.5rem; opacity: 0.15; }
+
+    /* History table */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .section-header {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 0.75rem 1.5rem;
+      text-align: left;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid var(--border);
+      font-weight: 500;
+    }
+    td {
+      padding: 1rem 1.5rem;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(30,45,69,0.5);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(14,165,233,0.03); }
+
+    /* Stage badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge-none { background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+    .badge-very-mild { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+    .badge-mild { background: rgba(249,115,22,0.1); color: #fb923c; border: 1px solid rgba(249,115,22,0.2); }
+    .badge-moderate { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+    .badge-unknown { background: rgba(100,116,139,0.1); color: #94a3b8; border: 1px solid rgba(100,116,139,0.2); }
+
+    .action-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.3rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .confidence-bar {
+      width: 80px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    .confidence-fill {
+      height: 100%;
+      border-radius: 10px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; display: block; }
+    .empty-state p { font-size: 0.9rem; }
+
+    /* ---- Sidebar Theme Switcher ---- */
+    .theme-switcher-sidebar { position: relative; }
+    .theme-toggle-sidebar {
+      width:100%; display:flex; align-items:center; gap:.6rem;
+      padding:.55rem .75rem; border-radius:8px; cursor:pointer;
+      border:1px solid var(--border); background:var(--surface2); color:var(--text);
+      font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:500;
+      transition:all .2s;
+    }
+    .theme-toggle-sidebar:hover { border-color:var(--accent); color:var(--accent); }
+    .t-dot-s {
+      width:9px; height:9px; border-radius:50%; flex-shrink:0;
+      background:var(--accent); box-shadow:0 0 6px var(--accent);
+      transition:background .3s, box-shadow .3s;
+    }
+    .theme-dd-sidebar {
+      position:absolute; bottom:calc(100% + 6px); left:0; right:0;
+      background:var(--surface); border:1px solid var(--border); border-radius:10px;
+      padding:.4rem; z-index:999; display:none; flex-direction:column; gap:.15rem;
+      box-shadow:0 -16px 40px rgba(0,0,0,.35);
+      animation:ddUp .15s cubic-bezier(.34,1.4,.64,1);
+    }
+    .theme-dd-sidebar.open { display:flex; }
+    @keyframes ddUp { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+    .topt {
+      display:flex; align-items:center; gap:.55rem;
+      padding:.4rem .55rem; border-radius:7px; cursor:pointer;
+      border:none; background:transparent; width:100%; text-align:left;
+      font-family:'DM Sans',sans-serif; font-size:.78rem; color:var(--text);
+      transition:background .12s;
+    }
+    .topt:hover { background:var(--surface2); }
+    .topt.active { background:var(--accent-glow); color:var(--accent); }
+    .topt small { display:block; font-size:.65rem; color:var(--muted); margin-top:.02rem; }
+    .topt.active small { color:var(--accent2); }
+    .tck { margin-left:auto; font-size:.65rem; opacity:0; }
+    .topt.active .tck { opacity:1; }
+    .tsw {
+      width:24px; height:24px; border-radius:6px; flex-shrink:0;
+      border:1.5px solid rgba(255,255,255,.08);
+    }
+    .sw1{background:linear-gradient(135deg,#0e0e12 50%,#7c6ff7);}
+    .sw2{background:linear-gradient(135deg,#f5f2ed 50%,#0d7377);}
+    .sw3{background:linear-gradient(135deg,#0c0809 50%,#e8956d);}
+    .sw4{background:linear-gradient(135deg,#f2f4f8 50%,#3b5bdb);}
+    .sw5{background:linear-gradient(135deg,#040f14 50%,#00d4aa);}
+    [data-theme="ivory-studio"] .tsw,
+    [data-theme="nordic-slate"]  .tsw { border-color:rgba(0,0,0,.12); }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon"><i class="fas fa-brain"></i></div>
+      <div class="logo-text">Neuro<span>Scan</span> AI</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a href="/dashboard" class="nav-item active">
+        <i class="fas fa-th-large"></i> Dashboard
+      </a>
+      <a href="/" class="nav-item">
+        <i class="fas fa-upload"></i> New Scan
+      </a>
+      <a href="/history" class="nav-item">
+        <i class="fas fa-history"></i> Scan History
+      </a>
+    </div>
+
+    <div class="nav-section" style="margin-top:1rem">
+      <div class="nav-label">Reports</div>
+      <a href="/reports" class="nav-item">
+        <i class="fas fa-file-pdf"></i> My Reports
+      </a>
+      <a href="/chat_history" class="nav-item">
+        <i class="fas fa-comments"></i> Chat History
+      </a>
+    </div>
+
+
+    <!-- Theme Switcher in sidebar -->
+    <div style="padding:0 0.75rem;margin-bottom:0.5rem;">
+      <div style="font-size:.65rem;font-weight:600;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;padding:0 .75rem;margin-bottom:.4rem;">Appearance</div>
+      <div class="theme-switcher-sidebar">
+        <button class="theme-toggle-sidebar" onclick="toggleThemeDD()" id="themeSideBtn">
+          <span class="t-dot-s" id="tDotS"></span>
+          <span id="themeLabelS">Theme</span>
+          <i class="fas fa-chevron-down" style="font-size:.6rem;margin-left:auto;"></i>
+        </button>
+        <div class="theme-dd-sidebar" id="themeDD">
+          <button class="topt" data-k="midnight-steel" onclick="setTheme('midnight-steel',this)">
+            <span class="tsw sw1"></span><span>Midnight Steel<small>Charcoal · Violet</small></span><i class="fas fa-check tck"></i>
+          </button>
+          <button class="topt" data-k="ivory-studio" onclick="setTheme('ivory-studio',this)">
+            <span class="tsw sw2"></span><span>Ivory Studio<small>Warm White · Teal</small></span><i class="fas fa-check tck"></i>
+          </button>
+          <button class="topt" data-k="obsidian-rose" onclick="setTheme('obsidian-rose',this)">
+            <span class="tsw sw3"></span><span>Obsidian Rose<small>Near-Black · Amber</small></span><i class="fas fa-check tck"></i>
+          </button>
+          <button class="topt" data-k="nordic-slate" onclick="setTheme('nordic-slate',this)">
+            <span class="tsw sw4"></span><span>Nordic Slate<small>Cool White · Indigo</small></span><i class="fas fa-check tck"></i>
+          </button>
+          <button class="topt" data-k="deep-ocean" onclick="setTheme('deep-ocean',this)">
+            <span class="tsw sw5"></span><span>Deep Ocean<small>Dark Teal · Aqua</small></span><i class="fas fa-check tck"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ current_user.name[0] | upper if current_user else 'U' }}</div>
+        <div>
+          <div class="user-name">{{ current_user.name if current_user else 'User' }}</div>
+          <div class="user-role">Medical Professional</div>
+        </div>
+        <a href="/logout" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Welcome back, {{ current_user.name if current_user else 'Doctor' }}</div>
+      </div>
+      <a href="/" class="btn-new"><i class="fas fa-plus"></i> New Scan</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Scans</div>
+        <div class="stat-value" style="color:var(--accent)">{{ total_scans | default(0) }}</div>
+        <div class="stat-icon"><i class="fas fa-brain"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Non Demented</div>
+        <div class="stat-value" style="color:#34d399">{{ non_demented | default(0) }}</div>
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Mild / Very Mild</div>
+        <div class="stat-value" style="color:#fbbf24">{{ mild_count | default(0) }}</div>
+        <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Moderate</div>
+        <div class="stat-value" style="color:#f87171">{{ moderate_count | default(0) }}</div>
+        <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+      </div>
+    </div>
+
+    <!-- Scan History -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title"><i class="fas fa-history" style="color:var(--accent);margin-right:8px"></i>Recent Scans</div>
+      </div>
+      {% if scans %}
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Prediction</th>
+            <th>Confidence</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for scan in scans %}
+          <tr>
+            <td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">
+              {{ scan.created_at.strftime('%d %b %Y, %I:%M %p') }}
+            </td>
+            <td>
+              {% if scan.prediction == 'NonDemented' %}
+                <span class="badge badge-none">🟢 Non Demented</span>
+              {% elif scan.prediction == 'VeryMildDemented' %}
+                <span class="badge badge-very-mild">🟡 Very Mild</span>
+              {% elif scan.prediction == 'MildDemented' %}
+                <span class="badge badge-mild">🟠 Mild</span>
+              {% elif scan.prediction == 'ModerateDemented' %}
+                <span class="badge badge-moderate">🔴 Moderate</span>
+              {% else %}
+                <span class="badge badge-unknown">⚪ Unknown</span>
+              {% endif %}
+            </td>
+            <td>
+              {{ scan.confidence | round(1) }}%
+              <span class="confidence-bar">
+                <span class="confidence-fill" style="width:{{ scan.confidence }}%;
+                  background: {% if scan.confidence > 75 %}#10b981{% elif scan.confidence > 60 %}#f59e0b{% else %}#ef4444{% endif %}">
+                </span>
+              </span>
+            </td>
+            <td>
+              <a href="/download_report/{{ scan.id }}" class="action-btn">
+                <i class="fas fa-file-pdf"></i> PDF
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <i class="fas fa-brain"></i>
+        <p>No scans yet. <a href="/" style="color:var(--accent)">Upload your first MRI scan</a> to get started.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Chat History -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title"><i class="fas fa-comments" style="color:var(--accent);margin-right:8px"></i>Recent Conversations</div>
+      </div>
+      {% if chat_sessions %}
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Messages</th>
+            <th>Related Scan</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for chat in chat_sessions %}
+          <tr>
+            <td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">
+              {{ chat.created_at.strftime('%d %b %Y') }}
+            </td>
+            <td>{{ chat.message_count }} messages</td>
+            <td>
+              {% if chat.scan_stage %}
+                <span class="badge badge-{{ chat.scan_stage | lower | replace('demented','') | trim }}">{{ chat.scan_stage }}</span>
+              {% else %}
+                <span style="color:var(--muted);font-size:0.8rem">No scan</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="/chat_history/{{ chat.id }}" class="action-btn">
+                <i class="fas fa-eye"></i> View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <i class="fas fa-comments"></i>
+        <p>No conversations yet. Start chatting with the assistant after uploading a scan.</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </main>
+
+
+  <script>
+    const NS_THEME_COLORS = {
+      'midnight-steel':'#7c6ff7','ivory-studio':'#0d7377',
+      'obsidian-rose':'#e8956d','nordic-slate':'#3b5bdb','deep-ocean':'#00d4aa'
+    };
+    const NS_THEME_NAMES = {
+      'midnight-steel':'Midnight Steel','ivory-studio':'Ivory Studio',
+      'obsidian-rose':'Obsidian Rose','nordic-slate':'Nordic Slate','deep-ocean':'Deep Ocean'
+    };
+    function setTheme(k, btn) {
+      document.documentElement.setAttribute('data-theme', k);
+      const dot = document.getElementById('tDotS');
+      if(dot){ dot.style.background=NS_THEME_COLORS[k]; dot.style.boxShadow='0 0 7px '+NS_THEME_COLORS[k]; }
+      const lbl = document.getElementById('themeLabelS');
+      if(lbl) lbl.textContent = NS_THEME_NAMES[k];
+      document.querySelectorAll('.topt').forEach(o=>o.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      localStorage.setItem('ns-theme', k);
+      closeThemeDD();
+    }
+    function toggleThemeDD(){ document.getElementById('themeDD').classList.toggle('open'); }
+    function closeThemeDD(){ const d=document.getElementById('themeDD'); if(d) d.classList.remove('open'); }
+    document.addEventListener('click', function(e){
+      const sw = document.querySelector('.theme-switcher-sidebar');
+      if(sw && !sw.contains(e.target)) closeThemeDD();
+    });
+    (function(){
+      const saved = localStorage.getItem('ns-theme') || 'midnight-steel';
+      const btn = document.querySelector('.topt[data-k="'+saved+'"]');
+      setTheme(saved, btn);
+    })();
+  </script>
+
+</body>
+</html>
